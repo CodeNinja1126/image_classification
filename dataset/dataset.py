@@ -14,7 +14,9 @@ img_type_list = ['.png', '.jpg', '.jpeg']
 
 csv_path = '/opt/ml/input/data/train/train.csv'
 data_path = '/opt/ml/input/data/train/images'
-mask_image_frame = pd.read_csv(csv_path)
+
+test_csv_path = '/opt/ml/input/data/eval/info.csv'
+test_data_path = '/opt/ml/input/data/eval/images'
 
 # 데이터 전처리
 data_transform = transforms.Compose([
@@ -75,12 +77,24 @@ class MaskImageDataset(Dataset):
 class ValidationSet(Dataset):
     
     def __init__(self, csv_file, data_path, transform=None):
-        pass
+        self.mask_image_frame = pd.read_csv(csv_file)
+        self.data_path = data_path
+        self.transform = transform
 
 
     def __len__(self):
-        pass
+        return len(self.mask_image_frame)
 
 
     def __getitem__(self, idx):
-        pass
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+        
+        img_path = os.path.join(self.data_path, 
+                               self.mask_image_frame.loc[idx, 'ImageID'])
+        image = Image.open(img_path)
+        
+        if self.transform:
+            image = self.transform(image)
+            
+        return image, idx

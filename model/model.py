@@ -111,9 +111,9 @@ class backboneModel(nn.Module):
         return x
         
 
-class classficationModel(nn.Module):
+class classificationModel(nn.Module):
     def __init__(self, num_classes = 18):
-        super(classficationModel, self).__init__()
+        super(classificationModel, self).__init__()
         
         self.relu = nn.ReLU()
         
