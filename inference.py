@@ -13,6 +13,7 @@ import pandas as pd
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 if __name__ == '__main__':
+    # argument parser
     parser = argparse.ArgumentParser(description='inference config')
     parser.add_argument('-a', required=True, type=str, help='model state dict address')
     parser.add_argument('-s', required=True, type=str, help='submisson file name')

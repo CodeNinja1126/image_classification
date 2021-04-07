@@ -3,6 +3,7 @@ import argparse
 
 import dataset
 import model
+from AdamP import AdamP
 
 import numpy as np
 
@@ -37,23 +38,24 @@ class F1Loss(nn.Module):
         return 1 - f1.mean()
 
 if __name__ == '__main__':
-    
+    # argument parser
     parser = argparse.ArgumentParser(description='Set some train option')
     parser.add_argument('-b', default=10, type=int, help='batch size (default : 10)')
     parser.add_argument('-e', default=5, type=int, help='epoch number (default : 5)')
-    parser.add_argument('-lr', default=3e-4, type=float, help='learning rate (default : 3e-4)')
+    parser.add_argument('-lr', default=0.001, type=float, help='learning rate (default : 0.001)')
     parser.add_argument('-c', default=None, type=str, help='checkpoint adress')
-    parser.add_argument('-s', default=None, type=str, help='trained state dict name')
+    parser.add_argument('-s', default=None, required=True, type=str, help='trained state dict name')
 
     args = parser.parse_args()
 
+    # load dataset
     mask_dataset = dataset.MaskImageDataset(dataset.data_transform)
-    
     data_loader = DataLoader(mask_dataset,
                         shuffle=True,
                         batch_size=args.b, 
                         num_workers=4)
 
+    # load model
     test_model = model.classificationModel().to(device)
     test_model.train()
 
@@ -61,9 +63,11 @@ if __name__ == '__main__':
         model_state_dict = torch.load(args.c)
         test_model.load_state_dict(model_state_dict)
 
+    # set loss function and optimizer
     criterion = F1Loss(classes=18)
-    optimizer = torch.optim.Adam(test_model.parameters(), lr=args.lr)
+    optimizer = AdamP(test_model.parameters(), lr=args.lr)
 
+    # training
     print('start training!')
     for epoch in range(args.e):
 
@@ -83,15 +87,15 @@ if __name__ == '__main__':
             running_loss += loss.item()
             if i % 100 == 99:
 
-                with torch.no_grad()
-
+                # measure accuracy
+                with torch.no_grad():
                     accuracy = 0
 
-                    for i in range(10):
+                    for _ in range(10):
                         test_model.eval()
                         eval_input, label = mask_dataset[np.random.randint(0,len(mask_dataset))]
                 
-                        if torch.argmax(test_model(eval_input)) ==
+                        if torch.argmax(test_model(eval_input.unsqueeze(0).to(device))) == \
                             torch.argmax(label):
                             accuracy +=1
 
@@ -103,4 +107,5 @@ if __name__ == '__main__':
 
 
     print('Finished Training')
+    # save model state_dict
     torch.save(test_model.state_dict(), args.s)
