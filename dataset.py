@@ -7,16 +7,6 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
 
-# 데이터셋 위치 및 파일 명
-img_name = ['normal', 'mask1', 'mask2', 
-            'mask3', 'mask4', 'mask5', 'incorrect_mask']
-img_type_list = ['.png', '.jpg', '.jpeg']
-
-csv_path = '/opt/ml/input/data/train/train.csv'
-data_path = '/opt/ml/input/data/train/images'
-
-test_csv_path = '/opt/ml/input/data/eval/info.csv'
-test_data_path = '/opt/ml/input/data/eval/images'
 
 # 데이터 전처리
 data_transform = transforms.Compose([
@@ -28,16 +18,18 @@ data_transform = transforms.Compose([
 
 class MaskImageDataset(Dataset):
     
-    def __init__(self, csv_file, data_path, transform=None):
+    def __init__(self, transform=None):
         """
         Args:
-            csv_file (string): csv_file 경로
-            data_path (string): data_path 경로
             transform (string): 샘플에 적용될 transform(전처리)
         """
-        self.mask_image_frame = pd.read_csv(csv_file)
-        self.data_path = data_path
+        self.mask_image_frame = pd.read_csv('/opt/ml/input/data/train/train.csv')
+        self.data_path = '/opt/ml/input/data/train/images'
         self.transform = transform
+
+        self.img_name = ['normal', 'mask1', 'mask2', 
+            'mask3', 'mask4', 'mask5', 'incorrect_mask']
+        self.img_type_list = ['.png', '.jpg', '.jpeg']
     
     
     def __len__(self):
@@ -51,9 +43,9 @@ class MaskImageDataset(Dataset):
         img_path = os.path.join(self.data_path, 
                                 self.mask_image_frame.loc[idx//7,'path'])
         
-        for img_type in img_type_list:
-            if os.path.isfile(os.path.join(img_path, img_name[idx%7] + img_type)):
-                image = Image.open(os.path.join(img_path, img_name[idx%7] + img_type))
+        for img_type in self.img_type_list:
+            if os.path.isfile(os.path.join(img_path, self.img_name[idx%7] + img_type)):
+                image = Image.open(os.path.join(img_path, self.img_name[idx%7] + img_type))
                 break
         
         if self.transform:
@@ -69,16 +61,16 @@ class MaskImageDataset(Dataset):
         elif idx%7 == 6:
             img_class += 6
         
-        label = torch.zeros((1, 18), dtype = torch.float)
-        label[0, img_class] += 1
+        label = torch.zeros(18, dtype = torch.float)
+        label[img_class] += 1
             
         return image, label
 
 class ValidationSet(Dataset):
     
-    def __init__(self, csv_file, data_path, transform=None):
-        self.mask_image_frame = pd.read_csv(csv_file)
-        self.data_path = data_path
+    def __init__(self, transform=None):
+        self.mask_image_frame = pd.read_csv('/opt/ml/input/data/eval/info.csv')
+        self.data_path = '/opt/ml/input/data/eval/images'
         self.transform = transform
 
 
