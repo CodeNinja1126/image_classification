@@ -70,3 +70,6 @@ def resLayer(channel, iter_num):
 ## inference.py 
 - eval dataset의 추론이 구현되어 있습니다.
 - inference 역시 argparse를 이용해 설정값을 줘 편리성을 높였습니다.
+
+## Notebook
+- Notebook 폴더에는 위의 각 구현물들의 프로토타입이 노트북으로 구현되어 있습니다.
