@@ -8,7 +8,7 @@ from torchvision import transforms
 from PIL import Image
 
 
-# 데이터 전처리
+# data preprocessing
 data_transform = transforms.Compose([
     transforms.Resize((384,384)),
     transforms.ToTensor(),
@@ -16,6 +16,7 @@ data_transform = transforms.Compose([
                          std=[0.229, 0.224, 0.225])
 ])
 
+# train dataset
 class MaskImageDataset(Dataset):
     
     def __init__(self, transform=None):
@@ -66,6 +67,7 @@ class MaskImageDataset(Dataset):
             
         return image, label
 
+# eval dataset
 class ValidationSet(Dataset):
     
     def __init__(self, transform=None):
