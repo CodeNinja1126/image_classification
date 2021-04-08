@@ -102,7 +102,7 @@ if __name__ == '__main__':
                     test_model.train()
 
                 print('[%d, %5d] loss: %.3f accuracy: %.1f' %
-                     (epoch + 1, i + 1, running_loss / 2000, accuracy / 10))
+                     (epoch + 1, i + 1, running_loss / 100, accuracy / 10))
                 running_loss = 0.0
 
 
