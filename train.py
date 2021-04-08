@@ -64,7 +64,7 @@ if __name__ == '__main__':
         test_model.load_state_dict(model_state_dict)
 
     # set loss function and optimizer
-    criterion = F1Loss(classes=18)
+    criterion = nn.CrossEntropyLoss()
     optimizer = AdamP(test_model.parameters(), lr=args.lr)
 
     # training
