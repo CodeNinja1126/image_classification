@@ -1,4 +1,4 @@
-# image_classification
+# mask_image_classification
 
 ## dataset.py
 - 학습 및 추론에 사용할 dataset 클래스의 구현이 정의되어 있습니다. 
